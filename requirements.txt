@@ -1,3 +1,7 @@
 beautifulsoup4
 requests
 chardet
+future
+six
+biopython
+pygr
