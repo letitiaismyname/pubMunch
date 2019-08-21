@@ -819,6 +819,7 @@ def findVariantDescriptions(text, exclPos=set()):
     varMentions = defaultdict(list)
     varDescObj = {}
     for seqType, mutType, isCoding, patName, pat in regexes:
+        print("@@@ type ", patName, pat.pattern)
         for match in pat.finditer(text):
             logger.debug("Match: Pattern %s, text %s" % (patName, match.groups()))
             if isOverlapping(match, exclPos):

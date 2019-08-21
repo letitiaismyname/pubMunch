@@ -5,6 +5,7 @@ from __future__ import print_function
 import logging, optparse, sys, glob, gzip, gdbm, marshal, zlib, copy, struct, hashlib
 from os.path import join, basename, isfile, dirname, abspath, splitext, isdir
 from collections import defaultdict
+import io
 
 # add <scriptDir>/lib/ to package search path
 sys.path.insert(0, join(dirname(abspath(__file__)), "lib"))
@@ -54,7 +55,8 @@ def writeHeaders(outFh):
 
 def readFile(inFname):
     logging.debug("Reading file %s" % inFname)
-    text = open(inFname).read()
+    with io.open(inFname, encoding="utf-8") as fh:
+        text = fh.read()
     title = ""
     abstract = ""
     pmid  = splitext(basename(inFname))[0]
@@ -95,7 +97,7 @@ def processText(pmid, title, abstract, text, writer, dbAnnots):
 def findInLocalFile(inFname, writer, dbAnnots):
     if seqCache==None:
         initCaches(dirname(inFname))
-    
+
     pmid, title, abstract, text = readFile(inFname)
     processText(pmid, title, abstract, text, writer, dbAnnots)
 
@@ -215,7 +217,7 @@ class DbAnnotator(object):
                     missDescs.append("%s / %s / %s:%s-%s" % (hgvs, annots, chrom, start, end))
                 outFh.write("%s Not found %s\n" % (self.docId, ",".join(missDescs)))
         #outFh.write("Manual annotations of these: %s" % ",".join(annots))
-        
+
     def printResults(self, outFh):
         # total count of all coordinates
         allCoords = set()
@@ -228,7 +230,7 @@ class DbAnnotator(object):
             #(self.docCount, self.predDocRefCount, self.mutCount, self.hgvsCount, self.mutHits))
             (self.docCount, self.predDocRefCount, coordCount, self.mutCount, self.mutHits))
 
-            
+
 class OutputWriter(object):
     def __init__(self, outFname, benchFname=None):
         self.outFh = maxTables.openFile(outFname, "w")
@@ -254,7 +256,7 @@ class OutputWriter(object):
 
     def close(self):
         self.outFh.close()
-        
+
 def runTests():
     #geneData = SeqData(mutDataDir, 9606)
     #assert( geneData.lookupDbSnp("chr4", 111547605,111547606)=="rs143894132")
