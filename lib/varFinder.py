@@ -20,6 +20,11 @@ from pygr.seqdb import SequenceFileDB
 
 regexes = None
 
+# unicode characters that represent plus or minus. Minus ASCII char must first
+# due to regexp char set below.
+plusChars = u'+\uFF0B'
+minusChars = u'-\u00AD\u2010\u2011\u2012\u2013\u2014\u2015\u207B\u208B\u2012\u2212\uFE63\uFF0D'
+
 # this setting can be changed to allow protein variants
 # that require a change of two base pairs. By default, it
 # is off to reduce false positives
@@ -533,7 +538,8 @@ def parseRegex(mutDataDir):
     "toPos"       : r'(?P<toPos>[1-9][0-9]*)',
     "pos"         : r'(?P<pos>[1-9][0-9]*)',
     "offset"         : r'(?P<offset>[1-9][0-9]*)',
-    "plusMinus"         : u'(?P<plusMinus>[-+\uFF0B\u00AD\u2010\u2011\u2012\u2013\u2014\u2015\u207B\u208B\u2012\u2212\uFE63\uFF0D])',
+    # minus muse be first to make range work
+    "plusMinus"         : u'(?P<plusMinus>[' + minusChars + plusChars +  u'])',
     "origAaShort" : r'(?P<origAaShort>[CISQMNPKDTFAGHLRWVEYX])',
     "origAasShort" : r'(?P<origAasShort>[CISQMNPKDTFAGHLRWVEYX]+)',
     "skipAa"  : r'(CYS|ILE|SER|GLN|MET|ASN|PRO|LYS|ASP|THR|PHE|ALA|GLY|HIS|LEU|ARG|TRP|VAL|GLU|TYR|TER|GLUTAMINE|GLUTAMIC ACID|LEUCINE|VALINE|ISOLEUCINE|LYSINE|ALANINE|GLYCINE|ASPARTATE|METHIONINE|THREONINE|HISTIDINE|ASPARTIC ACID|ARGININE|ASPARAGINE|TRYPTOPHAN|PROLINE|PHENYLALANINE|CYSTEINE|SERINE|GLUTAMATE|TYROSINE|STOP|X)',
@@ -617,9 +623,9 @@ def parseMatchSplicing(match, patName, seqType):
     seqEnd = seqEnd = seqStart + 1
     plusMinus = groups["plusMinus"]
     offset = int(groups["offset"])
-    if plusMinus == "+":
+    if plusMinus in plusChars:
         pass
-    elif plusMinus == "-":
+    elif plusMinus in minusChars:
         offset *= -1
     else:
         assert False
@@ -635,9 +641,9 @@ def parseMatchSub(match, patName, seqType, isCoding):
     offset = 0
     if not isCoding:
         if "plusMinus" in groups:
-            if groups["plusMinus"] == "+":
+            if groups["plusMinus"] in plusChars:
                 offset = int(groups["offset"])
-            if groups["plusMinus"] == "-":
+            if groups["plusMinus"] == minusChars:
                 offset = (-1)*int(groups["offset"])
 
     if "origAaShort" in groups:
@@ -682,9 +688,9 @@ def parseMatchDel(match, patName, seqType, isCoding):
     offset = 0
     if not isCoding:
         if "plusMinus" in groups:
-            if groups["plusMinus"] == "+":
+            if groups["plusMinus"] == plusChars:
                 offset = int(groups["offset"])
-            if groups["plusMinus"] == "-":
+            if groups["plusMinus"] == minusChars:
                 offset = (-1)*int(groups["offset"])
 
     if "fromPos" in groups:
@@ -723,9 +729,9 @@ def parseMatchIns(match, patName, seqType, isCoding):
     offset = 0
     if not isCoding:
         if "plusMinus" in groups:
-            if groups["plusMinus"] == "+":
+            if groups["plusMinus"] == plusChars:
                 offset = int(groups["offset"])
-            if groups["plusMinus"] == "-":
+            if groups["plusMinus"] == minusChars:
                 offset = (-1)*int(groups["offset"])
 
     if "fromPos" in groups:
@@ -762,9 +768,9 @@ def parseMatchDup(match, patName, seqType, isCoding):
     offset = 0
     if not isCoding:
         if "plusMinus" in groups:
-            if groups["plusMinus"] == "+":
+            if groups["plusMinus"] == plusChars:
                 offset = int(groups["offset"])
-            if groups["plusMinus"] == "-":
+            if groups["plusMinus"] == minusChars:
                 offset = (-1)*int(groups["offset"])
 
     if "origDna" in groups:
