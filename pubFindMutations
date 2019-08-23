@@ -92,7 +92,7 @@ def processText(pmid, title, abstract, text, writer, dbAnnots):
             writer.writeMuts(pmid, "notConfirmed", [ungroundVar])
         writer.writeBeds(beds)
 
-    dbAnnots.writeUnmappedMuts(writer.outFh)
+    dbAnnots.writeUnmappedMuts(sys.stderr)
 
 def findInLocalFile(inFname, writer, dbAnnots):
     if seqCache==None:
@@ -308,7 +308,7 @@ def main(args, options):
 
     logging.info("Wrote output to %s" % outFname)
 
-    dbAnnots.printResults(writer.outFh)
+    dbAnnots.printResults(sys.stderr)
     writer.close()
 
 # === COMMAND LINE INTERFACE, OPTIONS AND HELP ===
