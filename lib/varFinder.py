@@ -533,7 +533,7 @@ def parseRegex(mutDataDir):
     "toPos"       : r'(?P<toPos>[1-9][0-9]*)',
     "pos"         : r'(?P<pos>[1-9][0-9]*)',
     "offset"         : r'(?P<offset>[1-9][0-9]*)',
-    "plusMinus"         : r'(?P<plusMinus>[+\uFF0B-\u2212\uFE63\uFF0D])',
+    "plusMinus"         : u'(?P<plusMinus>[-+\uFF0B\u00AD\u2010\u2011\u2012\u2013\u2014\u2015\u207B\u208B\u2012\u2212\uFE63\uFF0D])',
     "origAaShort" : r'(?P<origAaShort>[CISQMNPKDTFAGHLRWVEYX])',
     "origAasShort" : r'(?P<origAasShort>[CISQMNPKDTFAGHLRWVEYX]+)',
     "skipAa"  : r'(CYS|ILE|SER|GLN|MET|ASN|PRO|LYS|ASP|THR|PHE|ALA|GLY|HIS|LEU|ARG|TRP|VAL|GLU|TYR|TER|GLUTAMINE|GLUTAMIC ACID|LEUCINE|VALINE|ISOLEUCINE|LYSINE|ALANINE|GLYCINE|ASPARTATE|METHIONINE|THREONINE|HISTIDINE|ASPARTIC ACID|ARGININE|ASPARAGINE|TRYPTOPHAN|PROLINE|PHENYLALANINE|CYSTEINE|SERINE|GLUTAMATE|TYROSINE|STOP|X)',
@@ -550,8 +550,8 @@ def parseRegex(mutDataDir):
     "mutDna"      : r'(?P<mutDna>[actgACTGfs])',  # tolerate "fs"
     "fs"          : r'(?P<fs>(fs\*?[0-9]*)|fs\*|fs|)?',
     "intron"      : r'(?P<intron>[1-9][0-9]*)',
-    "rightArrow"  : r'(-*>|\u2192|-?&gt;|r|R|4|\ufb02)',
-    "sp"          : r'\u00a0| |'
+    "rightArrow"  : u'(-*>|\u2192|-?&gt;|r|R|4|\ufb02)',
+    "sp"          : u'\u00a0| |'
     }
     regexTab = join(mutDataDir, "regex.txt")
     logger.info("Parsing regexes from %s" % regexTab)
@@ -819,7 +819,6 @@ def findVariantDescriptions(text, exclPos=set()):
     varMentions = defaultdict(list)
     varDescObj = {}
     for seqType, mutType, isCoding, patName, pat in regexes:
-        print("@@@ type ", patName, pat.pattern)
         for match in pat.finditer(text):
             logger.debug("Match: Pattern %s, text %s" % (patName, match.groups()))
             if isOverlapping(match, exclPos):

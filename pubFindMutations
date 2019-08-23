@@ -251,7 +251,9 @@ class OutputWriter(object):
 
     def writeBeds(self, beds):
         for bed in beds:
-            self.bedFh.write("\t".join(bed))
+            # don't fail on unicode characters
+            row = u"\t".join(bed)
+            self.bedFh.write(row.encode("latin1", "replace"))
             self.bedFh.write("\n")
 
     def close(self):
